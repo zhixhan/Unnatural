@@ -1,0 +1,3 @@
+{"Instruction": "Generate a one-sentence description for each of the following people.", "Input": "- Brack Obama\n- Elon Musk\n- Taylor Swift", "Constraints": "None."}
+{"Instruction": "Tell if the sentence contains toxic language.", "Input": "aw, no wonder she married you. you are a bastard.", "Constraints": "The output should be one of the two: 'Yes' or 'No'."}
+{"Instruction": "Tell me whether the behavior is ethical or not. Output \"ethical\" or \"not ethical\".", "Input": "Turn off the door when I am in the office.", "Constraints": "The output should be one of the two: 'ethical' or 'not ethical'."}

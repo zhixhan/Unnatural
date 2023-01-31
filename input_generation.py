@@ -77,15 +77,15 @@ def parse_args():
         help="The directory where the batch is stored.",
     )
     parser.add_argument(
-        "--seed_tasks_path",
+        "--seed_tasks",
         type=str,
-        default="data",
+        default="1, 2, 3, 4, 5",
         help="The path to the human written data.",
     )
     parser.add_argument(
         "--num_inputs_to_generate",
         type=int,
-        default=5000,
+        default=100000,
         help="th",
     )
     
@@ -112,8 +112,9 @@ if __name__ == "__main__":
     args = parse_args()
     all_seed_tasks = []
     all_seed_demonstrations = []
-    for i in range(1,6):
-        seed_tasks = [json.loads(l) for l in open(os.path.join(args.seed_tasks_path, 'seed'+str(i)+'.jsonl'), "r")]
+    seed_tasks_num = [int(s.strip()) for s in args.seed_tasks.split(",")]
+    for i in seed_tasks_num:
+        seed_tasks = [json.loads(l) for l in open(os.path.join('data', 'seed'+str(i)+'.jsonl'), "r")]
         all_seed_tasks.append(seed_tasks)
         seed_demonstrations = consrtuct_demonstrations(seed_tasks)
         all_seed_demonstrations.extend(seed_demonstrations)
@@ -130,35 +131,38 @@ if __name__ == "__main__":
                 request_idx = instruction_info["request_idx"] + 1
         print(f"Loaded {len(machine_instructions)} machine-generated inputs")
 
-    
-    # now let's generate new inputs!
-    progress_bar = tqdm.tqdm(total=args.num_inputs_to_generate)
-    if machine_instructions:
-        progress_bar.update(len(machine_instructions))
+    if len(machine_instructions) < args.num_inputs_to_generate:
+        
+        # now let's generate new inputs!
+        progress_bar = tqdm.tqdm(total=args.num_inputs_to_generate)
+        if machine_instructions:
+            progress_bar.update(len(machine_instructions))
 
-    with open(os.path.join(args.batch_dir, "machine_generated_inputs.jsonl"), "a") as fout:
-        while len(machine_instructions) < args.num_inputs_to_generate:
-            seed_tasks = random.choice(all_seed_tasks)
-            prompts = [encode_prompt(seed_tasks)]
-            results = make_gpt3_requests(
-                prompts=prompts,
-                max_tokens=1024,
-                temperature=1,
-                top_p=0.99,
-                stop_sequences=["\n\n", "\n16", "16.", "16 ."],
-                n=args.request_batch_size,
-            )
-            results = [r['response'] for r in results][0]['choices']
-            results = post_process_gpt3_response(results)
-            post_results = []
-            for res in results:
-                if res in all_seed_demonstrations or res in machine_instructions:
-                    continue
-                machine_instructions.append(res)
-                fout.write(json.dumps({
-                    "generation_input": res,
-                    "request_idx": request_idx
-                }) + "\n")
-                progress_bar.update(1)
+        with open(os.path.join(args.batch_dir, "machine_generated_inputs.jsonl"), "a") as fout:
+            while len(machine_instructions) < args.num_inputs_to_generate:
+                seed_tasks = random.choice(all_seed_tasks)
+                prompts = [encode_prompt(seed_tasks)]
+                results = make_gpt3_requests(
+                    prompts=prompts,
+                    max_tokens=1024,
+                    temperature=1,
+                    top_p=0.99,
+                    stop_sequences=["\n\n", "\n16", "16.", "16 ."],
+                    n=args.request_batch_size,
+                )
+                results = [r['response'] for r in results][0]['choices']
+                results = post_process_gpt3_response(results)
+                post_results = []
+                for res in results:
+                    if res in all_seed_demonstrations or res in machine_instructions:
+                        continue
+                    machine_instructions.append(res)
+                    fout.write(json.dumps({
+                        "generation_input": res,
+                        "request_idx": request_idx
+                    }) + "\n")
+                    progress_bar.update(1)
 
-            request_idx += 1
+                request_idx += 1
+    else:
+        print("Generation Finished!!!")

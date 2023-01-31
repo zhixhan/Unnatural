@@ -1,0 +1,3 @@
+{"Instruction": "Find out the largest one from a set of numbers. Output the number directly.", "Input": "{1001, 22, 500, -3999, 1e6, 85, -2e6}", "Constraints": "The output should be one of the seven: '1001', '22', '500', '-3999', '1e6', '85' or '-2e6'."}
+{"Instruction": "Generate a response given the previous chat history.", "Input": "Customer: Hello!\nWaitress: Hi! What can I do for you?\nCustomer: yeah I am looking for a toy for my son.", "Constraints": "None."}
+{"Instruction": "Select the oldest person from the list.", "Input": "George Washington, Confucius, Michael Jordan, Michelangelo", "Constraints": "The output should be one of the four: 'George Washington', 'Confucius', 'Michael Jordan' or 'Michelangelo'."}

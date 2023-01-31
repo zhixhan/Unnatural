@@ -1,0 +1,3 @@
+{"Instruction": "Identify if the following instance is passive-aggressive or not. Output 1 for passive-aggressive, and 0 for not.", "Input": "You\u2019re so lucky you got that promotion", "Constraints": "The output should be one of the two: '1' or '0'."}
+{"Instruction": "Write a cover letter based on the given facts.", "Input": "Name: Ebony Moore\nPhone: (123) 456-7891\nEmail: emoore@email.com\nApplying for: Product Manager at Cloud Clearwater\nCurrent role: Product Manager at River Tech", "Constraints": "None."}
+{"Instruction": "Write a recipe for the given ingredients that I have.", "Input": "rice, onion, milk, chicken breast, olive oil, butter, Worcestershire sauce, mustard", "Constraints": "None."}

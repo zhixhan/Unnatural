@@ -12,7 +12,7 @@ from gpt3_api import make_requests as make_gpt3_requests
 random.seed(42)
 
 def output_prompt(inputs):
-    return inputs + '\n\n' + "Output:"
+    return inputs + '\n' + "Output:"
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -35,9 +35,9 @@ def parse_args():
         help="The path to the machine generated data.",
     )
     parser.add_argument(
-        "--num_inputs",
+        "--num_outputs",
         type=int,
-        default=5000,
+        default=100000,
         help="th",
     )
     parser.add_argument(
@@ -65,13 +65,12 @@ if __name__ == '__main__':
 
     with open(os.path.join(args.batch_dir, args.input_file)) as fin:
         lines = fin.readlines()
-        if args.num_inputs is not None:
-            lines = lines[:args.num_inputs]
+        if args.num_outputs is not None:
+            lines = lines[:args.num_outputs]
         tasks = []
         for line in lines:
             data = json.loads(line)
             tasks.append(data)
-
 
     output_path = os.path.join(args.batch_dir, args.output_file)
     existing_requests = {}
@@ -84,20 +83,14 @@ if __name__ == '__main__':
                 except:
                     pass
         print(f"Loaded {len(existing_requests)} existing requests")
-
-    progress_bar = tqdm.tqdm(total=len(tasks))
-    with open(output_path, "w") as fout:
-        for batch_idx in range(0, len(tasks), args.request_batch_size):
-            batch = tasks[batch_idx: batch_idx + args.request_batch_size]
-            if all(d["generation_input"] in existing_requests for d in batch):
-                for d in batch:
-                    data = existing_requests[d["generation_input"]]
-                    fout.write(json.dumps({
-                        "generation_input": data["generation_input"],
-                        "generation_output": data["generation_output"]
-                    }, ensure_ascii=False) + "\n")
-                progress_bar.update(len(batch))
-            else:
+    if len(existing_requests) < args.num_outputs:
+        progress_bar = tqdm.tqdm(total=len(tasks))
+        tasks = tasks[len(existing_requests):]
+        progress_bar.update(len(existing_requests))
+        with open(os.path.join(args.batch_dir, "machine_generated_outputs.jsonl"), "a") as fout:
+            for batch_idx in range(0, len(tasks), args.request_batch_size):
+                batch = tasks[batch_idx: batch_idx + args.request_batch_size]
+                
                 prompts = []
                 for task in batch:
                     prompts.append(output_prompt(task['generation_input']))
@@ -109,15 +102,18 @@ if __name__ == '__main__':
                     stop_sequences=["\n", "\n\n"],
                     n=1,)
                 for i in range(len(batch)):
-                    if results[i]["response"] is None:
-                        continue
-                    response = results[i]["response"]["choices"][0]["text"]
-                    if response == "":
-                        continue
+                    response = ""
+                    if results[i]["response"] is not None:
+                        response = results[i]["response"]["choices"][0]["text"]
+                    if not (prompts[i].count("Instruction: ")==1 and prompts[i].count("Input: ")==1 and prompts[i].count("Constraints: ")==1):
+                        response = ""
+                    generation_input = prompts[i].split('Constraints: ')[0] + 'Output:'
                     fout.write(json.dumps({
-                        "generation_input": prompts[i],
+                        "generation_input": generation_input,
                         "generation_output": response
                     }, ensure_ascii=False) + "\n")
-                    progress_bar.update(1)
+                progress_bar.update(len(batch))
+    else:
+        print("Generation Finished!!!")
                     
                     
