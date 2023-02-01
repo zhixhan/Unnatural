@@ -1,0 +1,3 @@
+{"Instruction": "In this task, you need to compare the meaning of the two sentences and tell if they are the same. Output yes or no.", "Input": "Sentence 1: The teacher is speaking to the class.\nSentence 2: The teacher is speaking to the students.", "Constraints": "The output should be 'yes' or 'no'."}
+{"Instruction": "Brainstorm a list of possible New Year's resolutions.", "Input": "None.", "Constraints": "None."}
+{"Instruction": "Given a description of the symptom, identify the possible disease and suggest some medicine.", "Input": "I have a fever and I am coughing.", "Constraints": "None."}

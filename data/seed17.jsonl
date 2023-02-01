@@ -1,0 +1,3 @@
+{"Instruction": "Make a list of salty snacks with a soft texture.", "Input": "None.", "Constraints": "None."}
+{"Instruction": "Classify whether the following email is a spam or not. Output true or false.", "Input": "Hello,\n\nWe assessed the 2015 payment structure as provided for under the term of emplyment and discovered that you are due for a salary raise starting August 2015. \n\nYou salary raise documents are enclosed below:\n\nAccess the documet here\n\nFaithfully,\nHuman Resources", "Constraints": "The output should be 'true' or 'false'."}
+{"Instruction": "Write a review for a blender presents a safety issue because a blade broke off.", "Input": "None.", "Constraints": "None."}
