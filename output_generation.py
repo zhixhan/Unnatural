@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument(
         "--request_batch_size",
         type=int,
-        default=5,
+        default=20,
         help="The number of requests to send to GPT-3 at a time."
     )
     parser.add_argument(
